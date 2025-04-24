@@ -8,12 +8,14 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE;
 
 
 @DataJpaTest // H2 by default, replacing DB configured in the application
 @AutoConfigureTestDatabase(replace = NONE)
+@ActiveProfiles("tu")
 class MovieCrudTest {
 
     // 3 choices to access Hibernate session:
@@ -35,6 +37,7 @@ class MovieCrudTest {
         entityManager.persist(movie); // SQL: read sequence (strategy sequence) or maybe insert (strategy identity)
         System.out.println(movie);
         entityManager.flush(); // SQL: insert if not done before
+        System.out.println(movie);
     } // end transaction (Spring JPA test) => Rollback
 
 
