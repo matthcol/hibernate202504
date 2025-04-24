@@ -11,7 +11,7 @@ docker run --detach \
 	--env POSTGRES_DB=dbmovietu \
 	--env POSTGRES_USER=movie \
 	--env POSTGRES_PASSWORD=password \
-	-v ${PWD}\docker\sql-emptydb:/docker-entrypoint-initdb.d \
+	-v ${PWD}/docker/sql-emptydb:/docker-entrypoint-initdb.d \
 	-p 5432:5432 \
 	postgres:17
 ```
