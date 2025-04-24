@@ -33,4 +33,6 @@ docker run --detach `
 docker exec -it pg-dbmovietu psql -U movie -d dbmovietu
 \l
 \d
+\d movie
+show SEARCH_PATH;
 ```
