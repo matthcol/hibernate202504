@@ -34,7 +34,8 @@ create table have_genre(
 
 alter table movie add constraint FK_MOVIE_DIRECTOR
 	FOREIGN KEY (director_id)
-	references person(id);
+	references person(id)
+	on delete set null;
 alter table play add constraint FK_PLAY_MOVIE 
 	FOREIGN KEY (movie_id)
 	references movie(id);

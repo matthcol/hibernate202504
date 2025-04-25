@@ -43,7 +43,7 @@ public class Person {
     private List<Movie> directedMovies = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "actor")
+    @OneToMany(mappedBy = "actor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Play> plays = new ArrayList<>();
 
     public void addDirectedMovie(Movie movie){

@@ -3,6 +3,8 @@ package org.example.cinema.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.SqlTypes;
 
 import java.util.ArrayList;
@@ -75,10 +77,11 @@ public class Movie {
     // @Transient // non-persistent field: debug, prototype, new feature
     @ManyToOne(fetch = FetchType.LAZY) // default EAGER
     @JoinColumn(name = "director_id") // FK name, nullable
+    @OnDelete(action = OnDeleteAction.SET_NULL) // or program it in the service
     private Person director;
 
     @Builder.Default
-    @OneToMany(mappedBy = "movie")
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Play> plays = new ArrayList<>(); // with @BuilderDefault
 
     public void addPlay(Play play){
