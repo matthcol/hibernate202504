@@ -27,7 +27,13 @@ import java.util.List;
         name = "Movie.withDirectorAndActors",
         attributeNodes = {
                 @NamedAttributeNode("director"),
-                @NamedAttributeNode("actors")
+                @NamedAttributeNode(value = "plays", subgraph = "plays-sub")
+        },
+        subgraphs = {
+                @NamedSubgraph(
+                        name = "plays-sub",
+                        attributeNodes = @NamedAttributeNode("actor")
+                )
         }
 )
 public class Movie {
@@ -72,21 +78,10 @@ public class Movie {
     private Person director;
 
     @Builder.Default
-    // @Singular // actor one by one
-    @ManyToMany // default: LAZY
-    @JoinTable(
-            name = "play",
-            // NB: check FK constraints to avoid mistakes
-            inverseJoinColumns = @JoinColumn(name="actor_id"),
-            joinColumns = @JoinColumn(name="movie_id")
-    )
-    private List<Person> actors = new ArrayList<>(); // with @BuilderDefault
+    @OneToMany(mappedBy = "movie")
+    private List<Play> plays = new ArrayList<>(); // with @BuilderDefault
 
-    // NB: equals
-    // default strategy: don't write equals method (HBN uses address and id)
-    // with embedded/composite field => custom equals for the class representing field
-
-    public void addActor(Person actor){
-        this.getActors().add(actor);
+    public void addPlay(Play play){
+        this.getPlays().add(play);
     }
 }

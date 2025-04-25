@@ -11,7 +11,14 @@ import java.util.Optional;
 public interface MovieRepository extends JpaRepository<Movie, Integer> {
 
     @Override
+    // Solution 1
     @EntityGraph("Movie.withDirectorAndActors")
+    // Solution 2
+//    @EntityGraph(attributePaths = {
+//            "director",
+//            "plays",
+//            "plays.actor"
+//    })
     Optional<Movie> findById(Integer movieId);
 
     // Spring Data writes automatically queries with following vocabulary
@@ -24,14 +31,14 @@ public interface MovieRepository extends JpaRepository<Movie, Integer> {
     List<Movie> findByDirectorNameContainingIgnoreCase(String directorName);
 
     // JPQL/HQL
-    @Query("""
-    SELECT m 
-    FROM Movie m 
-        JOIN FETCH m.director d 
-        JOIN m.actors a
-    WHERE
-        d.name = :name
-        AND a.name = :name
-    """)
-    List<Movie> findByDirectorActor(String name);
+//    @Query("""
+//    SELECT m
+//    FROM Movie m
+//        JOIN FETCH m.director d
+//        JOIN m.actors a
+//    WHERE
+//        d.name = :name
+//        AND a.name = :name
+//    """)
+//    List<Movie> findByDirectorActor(String name);
 }

@@ -3,6 +3,7 @@ package org.example.cinema.entity.crud;
 import jakarta.persistence.EntityManager;
 import org.example.cinema.entity.Movie;
 import org.example.cinema.entity.Person;
+import org.example.cinema.entity.Play;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -43,45 +44,10 @@ class MovieCrudEmptyDatabaseTest {
     } // end transaction (Spring JPA test) => Rollback
 
 
-    @Test
-    // @Rollback(false) // view data in the database after the test
-    void testSaveWithPersons() {
-        var director = Person.builder()
-                .name("Ridley Scott")
-                .build();
-        var actor1 = Person.builder()
-                .name("Russel Crowe")
-                .birthdate(LocalDate.of(1964, 4, 7))
-                .build();
-        var actor2 = Person.builder()
-                .name("Joaquin Phoenix")
-                .build();
-        // persist persons before persisting movie
-        Stream.of(director, actor1, actor2)
-                .forEach(entityManager::persist);
-        entityManager.flush();
-
-        var movie = Movie.builder()
-                .title("Gladiator")
-                .year(2000)
-                .director(director)
-                .build();
-        movie.addActor(actor1);
-        movie.addActor(actor2);
-        // bidirectional reverse links:
-        director.addDirectedMovie(movie);
-        Stream.of(actor1, actor2)
-                .forEach(actor -> actor.addPlayedMovie(movie));
-
-        entityManager.persist(movie);
-
-        entityManager.flush();
-        System.out.println(movie);
-    }
 
     @Test
         // @Rollback(false) // view data in the database after the test
-    void testSaveWithPersons2() {
+    void testSaveWithPersons() {
         var director = Person.builder()
                 .name("Ridley Scott")
                 .build();
@@ -109,11 +75,16 @@ class MovieCrudEmptyDatabaseTest {
         entityManager.flush();
 
         // relation play after persistence
-        Stream.of(actor1, actor2)
-                .forEach(actor -> {
-                    movie.addActor(actor);
-                    actor.addPlayedMovie(movie);
-                });
+        Play play1 = new Play(movie, actor1, "Maximus");
+        Play play2 = new Play(movie, actor2, "Commodus");
+        // bidirectional links
+        Stream.of(play1, play2)
+                .forEach(movie::addPlay);
+        actor1.addPlay(play1);
+        actor2.addPlay(play2);
+
+        Stream.of(play1, play2)
+                        .forEach(entityManager::persist);
         entityManager.flush();
     }
 

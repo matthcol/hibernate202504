@@ -43,8 +43,8 @@ public class Person {
     private List<Movie> directedMovies = new ArrayList<>();
 
     @Builder.Default
-    @ManyToMany(mappedBy = "actors")
-    private List<Movie> playedMovies = new ArrayList<>();
+    @OneToMany(mappedBy = "actor")
+    private List<Play> plays = new ArrayList<>();
 
     public void addDirectedMovie(Movie movie){
         this.getDirectedMovies().add(movie);
@@ -54,11 +54,7 @@ public class Person {
         this.getDirectedMovies().remove(movie);
     }
 
-    public void addPlayedMovie(Movie movie){
-        this.getPlayedMovies().add(movie);
-    }
-
-    public void removePlayedMovie(Movie movie){
-        this.getPlayedMovies().remove(movie);
+    public void addPlay(Play play){
+        this.getPlays().add(play);
     }
 }
