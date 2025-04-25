@@ -22,7 +22,9 @@ import java.util.List;
 public class Person {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    // @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(generator = "person_seq")
+    @SequenceGenerator(name = "person_seq", sequenceName = "person_id_seq", allocationSize = 1)
     private Integer id;
 
     @Column(nullable = false, length= 30)

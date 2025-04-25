@@ -38,7 +38,10 @@ public class Movie {
     //          => implicit sequence
     // - sequence: explicit sequence (DDL), fetch id as soon as possible
     // @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    // @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    // custom sequence, replace strategy=sequence by generator = + @SequenceGenerator
+    @GeneratedValue(generator = "movie_seq")
+    @SequenceGenerator(name = "movie_seq", sequenceName = "movie_id_seq", allocationSize = 1)
     private Integer id;
     // NB: Object type let the filed null before persisting the entity
     //      primitive type set the field to 0 before persisting the entity
