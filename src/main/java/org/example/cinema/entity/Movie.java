@@ -23,6 +23,13 @@ import java.util.List;
         schema = "cinema",
         uniqueConstraints = @UniqueConstraint(columnNames = {"title", "year"})
 )
+@NamedEntityGraph(
+        name = "Movie.withDirectorAndActors",
+        attributeNodes = {
+                @NamedAttributeNode("director"),
+                @NamedAttributeNode("actors")
+        }
+)
 public class Movie {
 
     @Id // primary key
@@ -57,13 +64,13 @@ public class Movie {
     private String synopsis;
 
     // @Transient // non-persistent field: debug, prototype, new feature
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY) // default EAGER
     @JoinColumn(name = "director_id") // FK name, nullable
     private Person director;
 
     @Builder.Default
     // @Singular // actor one by one
-    @ManyToMany
+    @ManyToMany // default: LAZY
     @JoinTable(
             name = "play",
             // NB: check FK constraints to avoid mistakes

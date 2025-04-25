@@ -15,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(of={"id", "name", "birthdate"})
 // JPA
 @Entity
 @Table(schema = "cinema")
@@ -22,7 +23,7 @@ public class Person {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Integer Id;
+    private Integer id;
 
     @Column(nullable = false, length= 30)
     private String name;
