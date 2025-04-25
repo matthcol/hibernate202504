@@ -3,15 +3,16 @@ package org.example.cinema.entity.query;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import org.example.cinema.entity.Movie;
 import org.example.cinema.entity.Movie_;
+import org.example.cinema.entity.Person;
+import org.example.cinema.entity.Person_;
 import org.example.cinema.repository.MovieRepository;
 import org.example.cinema.repository.PersonRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -117,7 +118,7 @@ class MovieQueryRepositoryTest {
     }
 
     @Test
-    void testCriteria(){
+    void testCriteriaWhere(){
         int year = 1984;
         // Criteria builder
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -129,7 +130,7 @@ class MovieQueryRepositoryTest {
         Root<Movie> root = criteriaQuery.from(Movie.class);
         // 3. selection (where)
         CriteriaQuery<Movie> criteriaQuery2 = criteriaQuery.select(root)
-                .where(cb.equal(root.get(Movie_.year), year));
+                .where(cb.equal(root.get(Movie_.year), 1984));
 
         // finalization: query from criteria
         TypedQuery<Movie> query = entityManager.createQuery(criteriaQuery2);
@@ -138,4 +139,78 @@ class MovieQueryRepositoryTest {
         query.getResultStream()
                 .forEach(System.out::println);
     }
+
+    // TODO
+    // same query +
+    // - 1. add selection director name
+    // - 2. add fetch director
+
+    @Test
+    void testCriteriaJoinWhere(){
+        int year = 1973;
+        String directorName = "Clint Eastwood";
+
+        // Criteria builder
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+
+        // Build criteria
+        CriteriaQuery<Movie> criteriaQuery = cb.createQuery(Movie.class);
+        Root<Movie> root = criteriaQuery.from(Movie.class);
+        Join<Movie, Person> joinDirector = root.join(Movie_.DIRECTOR, JoinType.INNER);
+
+        CriteriaQuery<Movie> criteriaQuery2 = criteriaQuery.select(root)
+                .where(
+                        cb.equal(root.get(Movie_.YEAR), year),
+                        cb.equal(joinDirector.get(Person_.NAME), directorName)
+                );
+
+        // Finalisation: query from criteria
+        TypedQuery<Movie> query = entityManager.createQuery(criteriaQuery2);
+
+        // Execute query and put result into entities or dtos
+        query.getResultStream().forEach(movie -> {
+            System.out.println("- " + movie);
+            System.out.println("\t . director: " + movie.getDirector());
+        });
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "1973,Clint Eastwood",
+            "1973,Eastwood",
+            "1973,Clint",
+    })
+    void testCriteriaJoinFetchWhere(int year, String directorName){
+
+        // Criteria builder
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+
+        // Build criteria
+        CriteriaQuery<Movie> criteriaQuery = cb.createQuery(Movie.class);
+        Root<Movie> root = criteriaQuery.from(Movie.class);
+
+        // NB: don't do both join and fetch => 2 joins in the generated query
+        //   Join<Movie, Person> joinDirector = root.join(Movie_.director, JoinType.INNER);
+        //   Fetch<Movie, Person> fetchDirector = root.fetch(Movie_.director, JoinType.INNER);
+
+        // Solution: cast Fetch en Join, OK with JoinType compatible
+        @SuppressWarnings("unchecked")
+        Join<Movie, Person> joinDirector = (Join<Movie,Person>) root.fetch(Movie_.director, JoinType.INNER);
+
+        CriteriaQuery<Movie> criteriaQuery2 = criteriaQuery.select(root)
+                .where(
+                        cb.equal(root.get(Movie_.YEAR), year),
+                        cb.like(joinDirector.get(Person_.NAME), "%" + directorName + "%")
+                );
+
+        // Finalisation: query from criteria
+        TypedQuery<Movie> query = entityManager.createQuery(criteriaQuery2);
+
+        // Execute query and put result into entities or dtos
+        query.getResultStream().forEach(movie -> {
+            System.out.println("- " + movie);
+            System.out.println("\t . director: " + movie.getDirector());
+        });
+    }
+
 }

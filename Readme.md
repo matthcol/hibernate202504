@@ -28,7 +28,7 @@ docker run --detach `
 		postgres:17
 ```
 
-### connect to db in container
+#### connect to db in container
 ```
 docker exec -it pg-dbmovietu psql -U movie -d dbmovietu
 \l
@@ -36,3 +36,22 @@ docker exec -it pg-dbmovietu psql -U movie -d dbmovietu
 \d movie
 show SEARCH_PATH;
 ```
+
+### composition docker
+
+Start composition:
+```
+cd docker
+docker compose up -d
+```
+
+PgAdmin4 can be accessed with a browser at localhost:80
+
+#### connect to db in container
+```
+docker compose exec -it db psql -U movie -d dbmoviedata
+\d
+```
+
+
+
