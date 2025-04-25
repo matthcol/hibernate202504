@@ -10,6 +10,7 @@ import org.example.cinema.entity.Person;
 import org.example.cinema.entity.Person_;
 import org.example.cinema.repository.MovieRepository;
 import org.example.cinema.repository.PersonRepository;
+import org.example.cinema.tools.JpaTools;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -194,8 +195,11 @@ class MovieQueryRepositoryTest {
         //   Fetch<Movie, Person> fetchDirector = root.fetch(Movie_.director, JoinType.INNER);
 
         // Solution: cast Fetch en Join, OK with JoinType compatible
-        @SuppressWarnings("unchecked")
-        Join<Movie, Person> joinDirector = (Join<Movie,Person>) root.fetch(Movie_.director, JoinType.INNER);
+        //  @SuppressWarnings("unchecked")
+        //  Join<Movie, Person> joinDirector = (Join<Movie,Person>) root.fetch(Movie_.director, JoinType.INNER);
+
+        // Idem with toolbox handling cast:
+        Join<Movie, Person> joinDirector = JpaTools.castFetch2Join(root.fetch(Movie_.director, JoinType.INNER));
 
         CriteriaQuery<Movie> criteriaQuery2 = criteriaQuery.select(root)
                 .where(
